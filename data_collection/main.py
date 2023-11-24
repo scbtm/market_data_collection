@@ -5,6 +5,7 @@ from data_collection import functions as Fns
 from data_collection.config import constants as Config
 import pandas as pd #type: ignore
 import argparse
+import os
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('--batch_size', 
@@ -56,7 +57,9 @@ def read_ticker_directory() -> list:
 
 def get_ticker_info(tickers:list, metadata:pd.DataFrame) -> list:
     market_data_collector = MarketDataCollector(tickers = tickers, tmp_folder=Config['local']['tmp_directory'], existing_metadata=metadata)
-    relevant_metadata = market_data_collector.get_relevant_metadata()
+    #TODO CHECK
+    #relevant_metadata = market_data_collector.get_relevant_metadata()
+    relevant_metadata = market_data_collector.get_tickers_to_ingest()
 
     if relevant_metadata is not None:
         return relevant_metadata
@@ -75,12 +78,22 @@ def update_all_stocks(tickers):
                                            tickers)
         
 def read_metadata_files_from_tmp_folder() -> list:
-
-    return
+    base_path = Config['local']['tmp_directory']
+    metadata_files = Fns.get_files_from_directory(base_path)
+    tmp_metadata = []
+    for file in metadata_files:
+        if 'metadata' in file:
+            tmp_metadata.append(pd.read_csv(os.path.join(base_path, file)))
+    return tmp_metadata
 
 def read_data_files_from_tmp_folder() -> list:
-
-    return
+    base_path = Config['local']['tmp_directory']
+    data_files = Fns.get_files_from_directory(base_path)
+    tmp_data = []
+    for file in data_files:
+        if 'history' in file:
+            tmp_data.append(pd.read_csv(os.path.join(base_path, file)))
+    return tmp_data
         
 def make_local_data_paths():
 
@@ -119,6 +132,9 @@ def run_full_pipeline(tickers, data, metadata):
     else:
         metadata = new_metadata
         data = new_data
+
+    metadata = metadata.drop_duplicates()
+    data = data.drop_duplicates()
 
     #Step 8: write_data_to_bucket
     metadata.to_csv(Config['remote']['metadata_file'], index=False)

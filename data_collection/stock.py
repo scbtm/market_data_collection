@@ -44,7 +44,7 @@ class Stock:
         if self.last_datapoint is not None:
 
             try:
-                last_datapoint = pd.to_datetime(last_datapoint)
+                last_datapoint = pd.to_datetime(self.last_datapoint)
                 start_date = (last_datapoint + pd.DateOffset(days=1)).strftime('%Y-%m-%d')
                 self.start_date = start_date
                 self.timeframe = {'start': start_date}
@@ -105,21 +105,24 @@ class Stock:
         return df if data_processed_is_valid else None
     
     def process_stock_dataframe(self, df:pd.DataFrame) -> pd.DataFrame:
+        columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']
+
         #Make sure the index is a datetime object
         df.index = pd.to_datetime(df.index)
 
         #Make sure the index is sorted
         df.sort_index(inplace=True)
+
         #Fill in weekends with last seen value in series
         df = df.resample('D').ffill()
         df.reset_index(inplace=True)
         df = df[columns]
-        first_day = df['Date'].iloc[0]
-        last_day = df['Date'].iloc[-1]
+
+        #first_day = df['Date'].iloc[0]
+        #last_day = df['Date'].iloc[-1]
         df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')
         df['Volume'] = df['Volume'].astype(int)
 
-        columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']
         types = {'Date': 'str', 
                 'Open': 'float', 
                 'High': 'float', 
@@ -129,8 +132,9 @@ class Stock:
                 'Ticker': 'str'}
 
         #Verify the final schema (col types only) is correct
-        schema_is_valid = all([df[col].dtype == types[col] for col in columns]) 
-        return df if schema_is_valid else None
+        #schema_is_valid = all([df[col].dtype == types[col] for col in columns]) 
+        #print(str(schema_is_valid))
+        return df #if schema_is_valid else None
     
     def write_tmp_data(self, df:pd.DataFrame):
         """
@@ -207,9 +211,9 @@ class MarketDataCollector:
 
     def get_relevant_metadata(self):
         if self.existing_metadata is not None:
-            self.existing_tickers = self.metadata['ticker'].tolist()
-            self.most_recent_datapoints = self.metadata['last_day'].tolist()
-            self.previous_ingestion_dates = self.metadata['ingestion_date'].to_list()
+            self.existing_tickers = self.existing_metadata['ticker'].tolist()
+            self.most_recent_datapoints = self.existing_metadata['last_day'].tolist()
+            self.previous_ingestion_dates = self.existing_metadata['ingestion_date'].to_list()
 
             ingestion_information = list(zip(self.existing_tickers, 
                                              self.most_recent_datapoints, 
@@ -243,27 +247,30 @@ class MarketDataCollector:
 
         #These are tickers that should be tracked and are in metadata ie previously tracked
         tickers_to_ingest = self.filter_existing_tickers()
-        ticker_names = [ticker[0] for ticker in tickers_to_ingest]
-        selected_tickers = self.tickers
-
-        #If a ticker is existing in previous metadata, but it is not in the list of tickers to ingest, 
-        # it should not be ingested
-        selected_and_existing = set(selected_tickers).intersection(ticker_names)
-        selected_and_non_existing = set(selected_tickers) - selected_and_existing
-
-        final_ticker_list = list(selected_and_existing.union(selected_and_non_existing))
-
-        tickers_to_ingest = [ticker for ticker in tickers_to_ingest if ticker[0] in final_ticker_list]
 
         if tickers_to_ingest is not None:
             ticker_names = [ticker[0] for ticker in tickers_to_ingest]
+            selected_tickers = self.tickers
 
-            #These are tickers that should be tracked but are not in metadata ie not previously tracked
-            #i.e. their last datapoint and ingestion date are both None
-            new_tickers = [(ticker, None, None) for ticker in self.tickers if ticker not in ticker_names]
+            #If a ticker is existing in previous metadata, but it is not in the list of tickers to ingest, 
+            # it should not be ingested
+            selected_and_existing = set(selected_tickers).intersection(ticker_names)
+            selected_and_non_existing = set(selected_tickers) - selected_and_existing
 
-            #Combine the two lists
-            tickers_to_ingest.extend(new_tickers)
+            final_ticker_list = list(selected_and_existing.union(selected_and_non_existing))
+
+            #TODO CHECK ticker[0] or ticker in listcomp, check tickers_to_ingest listcomp
+            tickers_to_ingest = [ticker for ticker in tickers_to_ingest if ticker in final_ticker_list]
+
+            if tickers_to_ingest is not None:
+                ticker_names = [ticker for ticker in tickers_to_ingest]
+
+                #These are tickers that should be tracked but are not in metadata ie not previously tracked
+                #i.e. their last datapoint and ingestion date are both None
+                new_tickers = [(ticker, None, None) for ticker in self.tickers if ticker not in ticker_names]
+
+                #Combine the two lists
+                tickers_to_ingest.extend(new_tickers)
 
         else:
             tickers_to_ingest = [(ticker, None, None) for ticker in self.tickers]

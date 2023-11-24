@@ -17,4 +17,4 @@ constants['remote']['data_file'] = f"{constants['remote']['data_folder']}/stock_
 #Get the working directory
 working_directory = os.getcwd()
 constants['local']['data_directory'] = f"{working_directory}/data"
-constants['local']['tmp_directory'] = f"{constants['local']['data_directory']}/tmp"
+constants['local']['tmp_directory'] = f"{constants['local']['data_directory']}/temp"

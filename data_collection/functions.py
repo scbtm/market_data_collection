@@ -77,6 +77,25 @@ def read_remote_csv(path:str) -> pd.DataFrame:
     except Exception as e:
         print(f"Error reading file {path}: {e}")
         return None
+
+def get_files_from_directory(path:str) -> list:
+    """
+    Gets a list of files from a directory
+
+    Args:
+        path (str): Path to the directory
+
+    Returns:
+        list: List of files in the directory
+    """
+    try:
+        #Use the os module to get a list of files in the directory
+        files = os.listdir(path)
+        return files
+        
+    except Exception as e:
+        print(f"Error getting files from directory {path}: {e}")
+        return []
     
 def delete_folder(path:str) -> bool:
     """

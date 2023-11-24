@@ -3,3 +3,4 @@ poetry.lock
 stock_data_lake
 tests/__pycache__
 validation.ipynb
+data
