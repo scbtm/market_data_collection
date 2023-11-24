@@ -4,8 +4,17 @@ from data_collection.stock import Stock, MarketDataCollector
 from data_collection import functions as Fns
 from data_collection.config import constants as Config
 import pandas as pd #type: ignore
+import argparse
 
-batch_mode = True
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--batch_size', 
+                    type=int, 
+                    default=0,
+                    help='The batch size to use for the data collection')
+args = parser.parse_args()
+
+
+batch_size = args.batch_size
 
 #Check if data and metadata exist already in remote bucket
 def check_remote_data_exists() -> bool:
@@ -130,10 +139,10 @@ if __name__ == "__main__":
         metadata = None
         data = None
 
-    if batch_mode:
+    if batch_size > 0:
         #Create iterable chunks of tickers
-        chunk_size = 100
-        ticker_chunks = [tickers[i:i + chunk_size] for i in range(0, len(tickers), chunk_size)]
+        batch_size = 100
+        ticker_chunks = [tickers[i:i + batch_size] for i in range(0, len(tickers), batch_size)]
         run_full_pipeline(ticker_chunks, data, metadata)
     else:
         run_full_pipeline(tickers, data, metadata)
