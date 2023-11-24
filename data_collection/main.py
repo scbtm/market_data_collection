@@ -56,11 +56,19 @@ def read_ticker_directory() -> list:
 
 def get_ticker_info(tickers:list, metadata:pd.DataFrame) -> list:
     market_data_collector = MarketDataCollector(tickers = tickers, tmp_folder=Config['local']['tmp_directory'], existing_metadata=metadata)
-    return market_data_collector.get_relevant_metadata()
+    relevant_metadata = market_data_collector.get_relevant_metadata()
+
+    if relevant_metadata is not None:
+        return relevant_metadata
+    else:
+        relevant_metadata = [(t, None, None) for t in tickers]
+    return relevant_metadata
 
 def update_all_stocks(tickers):
+    n_tickers = len(tickers)
+
     # Initialize a thread pool for concurrent execution
-    with ThreadPool(processes=len(tickers)) as pool:
+    with ThreadPool(processes=n_tickers) as pool:
         pool.map(lambda ticker_info: Stock(ticker = ticker_info[0], 
                                            tmp_folder=Config['local']['tmp_directory'],
                                            last_datapoint=ticker_info[1]).run_pipeline(), 

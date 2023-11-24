@@ -53,7 +53,7 @@ def validate_file_exists(path:str) -> bool:
         bool: True if the path exists and is not empty
     """
     try:
-        metadata = pd.read_csv(path, n_rows=5)
+        metadata = pd.read_csv(path, nrows=5)
         return True
         
     except Exception as e:
