@@ -1,5 +1,4 @@
 data_collection/__pycache__
-poetry.lock
 stock_data_lake
 tests/__pycache__
 validation.ipynb
