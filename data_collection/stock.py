@@ -1,9 +1,8 @@
-import yfinance as yf #type: ignore
+import yfinance as yf
 import logging
 from multiprocessing.pool import ThreadPool
-import pandas as pd #type: ignore
+import pandas as pd
 from data_collection import functions as Fns
-import requests #type: ignore
 
 class StockMetadataManager:
 

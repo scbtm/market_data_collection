@@ -4,9 +4,8 @@ bucket = 'stock_data_lake'
 
 constants = {}
 constants['remote'] = {}
-constants['local'] = {}
 
-#Paths to storage data in bucket
+#Paths to store data in bucket
 constants['remote']['bucket'] = bucket
 constants['remote']['ticker_file'] = f"{bucket}/tickers.csv"
 constants['remote']['data_folder'] = f"{bucket}/data"

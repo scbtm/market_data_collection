@@ -1,4 +1,4 @@
-from fastapi import FastAPI # type: ignore
+from fastapi import FastAPI
 from stock import StockDataCollector, StockMetadataManager  # Ensure these imports are correct
 from config import constants as Config
 import logging
@@ -12,6 +12,8 @@ logging.basicConfig(level=logging.INFO)
 metadata_manager = StockMetadataManager(config=Config)
 data_collector = StockDataCollector(metadata_manager=metadata_manager)
 
+
+#This endpoint will trigger the pipeline and it will be deployed to Cloud Run
 @app.post("/trigger_pipeline")
 def trigger_pipeline():
     try:

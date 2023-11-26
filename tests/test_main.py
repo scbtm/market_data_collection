@@ -1,3 +1,3 @@
 
-## TODO complete testing and verify
+## TODO complete testing
 

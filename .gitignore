@@ -1,3 +1,4 @@
+#Do not track the following files/folders:
 data_collection/__pycache__
 stock_data_lake
 tests/__pycache__

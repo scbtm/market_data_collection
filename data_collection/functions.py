@@ -1,6 +1,4 @@
-import pandas as pd #type: ignore
-import os
-import shutil
+import pandas as pd
 
 def read_remote_csv(path:str) -> pd.DataFrame:
     """
