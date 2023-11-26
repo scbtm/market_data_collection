@@ -20,6 +20,7 @@ class StockMetadataManager:
         """
         # Get the tickers from the remote bucket
         tickers = Fns.read_remote_csv(self.config['remote']['ticker_file'])
+        tickers = tickers['Ticker'].tolist()
 
         # Validate the tickers
         tickers_is_valid = isinstance(tickers, list) and len(tickers) > 0
@@ -35,15 +36,17 @@ class StockMetadataManager:
         """
         # Get the metadata from the remote bucket
         metadata = Fns.read_metadata_csv(self.config['remote']['metadata_file'])
+        metadata_is_valid = False
 
-        metadata['ingestion_date'] = pd.to_datetime(metadata['ingestion_date'])
+        if metadata is not None:
+            metadata['ingestion_date'] = pd.to_datetime(metadata['ingestion_date'])
 
-        #Keep only the latest data in the metadata file
-        metadata = metadata.sort_values(by=['ticker', 'ingestion_date'], ascending=True)
-        metadata = metadata.groupby('ticker').last().reset_index()
+            #Keep only the latest data in the metadata file
+            metadata = metadata.sort_values(by=['ticker', 'ingestion_date'], ascending=True)
+            metadata = metadata.groupby('ticker').last().reset_index()
 
-        # Validate the metadata
-        metadata_is_valid = isinstance(metadata, pd.DataFrame) and not metadata.empty
+            # Validate the metadata
+            metadata_is_valid = isinstance(metadata, pd.DataFrame) and not metadata.empty
 
         return metadata if metadata_is_valid else None
     
@@ -305,8 +308,8 @@ class StockDataCollector:
         metadata_path = self.metadata_manager.config['remote']['metadata_file']
 
         #Read the existing data and metadata
-        existing_data = Fns.read_remote_csv(data_path)
-        existing_metadata = Fns.read_remote_csv(metadata_path)
+        existing_data = Fns.read_data_csv(data_path)
+        existing_metadata = Fns.read_metadata_csv(metadata_path)
 
         if existing_data is not None and existing_metadata is not None:
             # Append the new data and metadata
@@ -323,8 +326,10 @@ class StockDataCollector:
             return True
         
         else:
-            logging.error("Error saving updates. Existing data or metadata is invalid")
-            return None
+            # Write the dataframes
+            logging.info("No existing data or metadata found. Writing new data and metadata")
+            data.to_csv(data_path, index=False)
+            metadata.to_csv(metadata_path, index=False)
 
             
     

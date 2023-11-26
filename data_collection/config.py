@@ -1,5 +1,3 @@
-import os
-
 bucket = 'stock_data_lake'
 
 constants = {}

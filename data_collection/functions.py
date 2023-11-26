@@ -33,5 +33,23 @@ def read_metadata_csv(path:str) -> pd.DataFrame:
         return df
         
     except Exception as e:
-        print(f"No metadata csv file found {path}: {e}")
+        print(f"All tickers will be ingested. No metadata csv file found {path}.")
+        return None
+    
+def read_data_csv(path:str) -> pd.DataFrame:
+    """
+    Reads a data csv from a remote bucket
+
+    Args:
+        path (str): Path to the csv
+
+    Returns:
+        pd.DataFrame: Dataframe of the csv
+    """
+    try:
+        df = pd.read_csv(path)
+        return df
+        
+    except Exception as e:
+        print(f"First time ingestion: No data csv file found {path}.")
         return None
