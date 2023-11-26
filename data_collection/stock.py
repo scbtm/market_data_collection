@@ -137,6 +137,7 @@ class StockMetadataManager:
 
 class Stock:
     def __init__(self, ticker:str, ingestion_plan:str, ingestion_date:str):
+        logging.info(f"Ticker {ticker} initialized")
         #Stock ticker
         self.ticker = ticker
 
@@ -218,6 +219,12 @@ class Stock:
                 'input_null_values': self.null_values_exist,
                 'processed_null_values': self.processed_null_values
             }, index=[0])
+
+        if data_processed_is_valid:
+            logging.info(f"Ticker {self.ticker} history fetched")
+
+        else:
+            logging.info(f"Ticker {self.ticker} history failed")
 
         return df, metadata if data_processed_is_valid else None
     

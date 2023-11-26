@@ -1,9 +1,7 @@
-from fastapi import FastAPI
 from stock import StockDataCollector, StockMetadataManager  # Ensure these imports are correct
 from config import constants as Config
 import logging
 
-app = FastAPI()
 
 # Set up logging to print to stdout, which Cloud Run will capture
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +12,6 @@ data_collector = StockDataCollector(metadata_manager=metadata_manager)
 
 
 #This endpoint will trigger the pipeline and it will be deployed to Cloud Run
-@app.post("/trigger_pipeline")
 def trigger_pipeline():
     try:
         data, metadata = data_collector.run_ingestion_pipeline_localy()
@@ -36,3 +33,8 @@ def trigger_pipeline():
     except Exception as e:
         logging.exception("Error occurred during data ingestion.")
         return {"message": f"An error occurred during data ingestion: {e}"}
+
+
+# Call the main function
+if __name__ == "__main__":
+    trigger_pipeline()

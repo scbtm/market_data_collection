@@ -1,4 +1,9 @@
-bucket = 'stock_data_lake'
+import os
+
+# Use os.environ.get() to read environment variables
+STOCK_DATA_BUCKET = os.environ.get('STOCK_DATA_BUCKET', 'stock_data_lake')
+
+bucket = STOCK_DATA_BUCKET
 
 constants = {}
 constants['remote'] = {}
