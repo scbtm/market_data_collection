@@ -87,7 +87,8 @@ class StockMetadataManager:
             metadata.rename(columns={'last_day': 'last_datapoint'}, inplace=True)
 
             #join the two dataframes
-            tickers_to_ingest = tickers.merge(metadata, how='left', on='ticker')
+            tickers_df = pd.DataFrame({'ticker': tickers})
+            tickers_to_ingest = tickers_df.merge(metadata, how='left', on='ticker')
 
             # Fill the missing values (those without metadata) with 'max' to fetch all data
             tickers_to_ingest['last_datapoint'] = tickers_to_ingest['last_datapoint'].fillna('max')
@@ -194,6 +195,10 @@ class Stock:
             except Exception as e:
                 logging.error(f"Error processing data for {self.ticker}: {e}")
 
+        else:
+            logging.error(f"Error loading history of {self.ticker}. Retrieved data is not valid")
+            return None
+
         # Extract metadata if data is valid
         if data_processed_is_valid:
             self.first_day = df['Date'].iloc[0]
@@ -275,9 +280,11 @@ class StockDataCollector:
             pool.join()
             # Get the results
             for result in results:
-                df, metadata_df = result.get()
-                dataframes.append(df)
-                metadata.append(metadata_df)
+                output = result.get()
+                if output is not None:
+                    df, metadata_df = output
+                    dataframes.append(df)
+                    metadata.append(metadata_df)
 
             # Concatenate the dataframes
             dataframes = pd.concat(dataframes, ignore_index=True, axis=0)
