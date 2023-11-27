@@ -1,5 +1,5 @@
 # Use the official Python base image
-FROM python:3.9-slim
+FROM python:3.10
 
 # Set the working directory in the container
 WORKDIR /app
@@ -14,9 +14,8 @@ RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false
 
 # Install dependencies using Poetry, skipping development dependencies
-RUN poetry install --no-dev --no-interaction --no-ansi
+RUN poetry install
 
-# Copy the rest of your application code to the container
 COPY . /app
 
 # Run the application
