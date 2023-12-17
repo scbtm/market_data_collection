@@ -2,7 +2,7 @@ import yfinance as yf
 import logging
 from multiprocessing.pool import ThreadPool
 import pandas as pd
-import functions as Fns
+from . import functions as Fns
 
 class StockMetadataManager:
 
@@ -229,7 +229,7 @@ class Stock:
         return df, metadata if data_processed_is_valid else None
     
     def process_stock_dataframe(self, df:pd.DataFrame) -> pd.DataFrame:
-        columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']
+        #columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']
 
         #Make sure the index is a datetime object
         df.index = pd.to_datetime(df.index)
@@ -238,9 +238,9 @@ class Stock:
         df.sort_index(inplace=True)
 
         #Fill in weekends with last seen value in series
-        df = df.resample('D').ffill()
+        #df = df.resample('D').ffill()
         df.reset_index(inplace=True)
-        df = df[columns]
+        #df = df[columns]
 
         df['Date'] = df['Date'].dt.strftime('%Y-%m-%d')
         df['Volume'] = df['Volume'].astype(int)
