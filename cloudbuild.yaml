@@ -4,10 +4,5 @@ steps:
          '-t', '$_LOCATION-docker.pkg.dev/$_PROJECT_ID/$_REPOSITORY_NAME/market_data_collection:$COMMIT_SHA',
          '-f', 'Dockerfile',
          '.']
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args: ['run', 'jobs', 'deploy', 'market-data-collection',
-           '--image', '$_LOCATION-docker.pkg.dev/$_PROJECT_ID/$_REPOSITORY_NAME/market_data_collection:$COMMIT_SHA',
-           '--region', 'us-central1']
 images:
 - '$_LOCATION-docker.pkg.dev/$_PROJECT_ID/$_REPOSITORY_NAME/market_data_collection:$COMMIT_SHA'
