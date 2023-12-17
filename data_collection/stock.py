@@ -2,7 +2,7 @@ import yfinance as yf
 import logging
 from multiprocessing.pool import ThreadPool
 import pandas as pd
-from . import functions as Fns
+import functions as Fns
 
 class StockMetadataManager:
 
